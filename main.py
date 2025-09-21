@@ -1,14 +1,14 @@
-# -------------------------------
-# 1. Imports
-# -------------------------------
+
+# 1. Module Imports
+
 import pandas as pd
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from datetime import datetime
 
-# -------------------------------
-# 2. Core Functions (Business Logic)
-# -------------------------------
+
+# 2. Functions 
+
 
 def load_consumption_data(file_path):
     df = pd.read_csv(file_path, parse_dates=['timestamp'])
@@ -19,9 +19,9 @@ def calculate_flat_rate_from_data(df, rate_per_kwh, fixed_fee=0):
     return (total_kwh * rate_per_kwh) + fixed_fee
 
 def classify_period(hour):
-    if 18 <= hour < 22:     # Peak
+    if 18 <= hour < 22:     # Peak period
         return "Peak"
-    elif 22 <= hour or hour < 7:  # Off-Peak
+    elif 22 <= hour or hour < 7:  # Off-Peak period
         return "Off-Peak"
     else:
         return "Shoulder"
@@ -85,7 +85,7 @@ def calculate_bill():
     except ValueError:
         messagebox.showerror("Input Error", "Please enter valid numbers.")
 
-# Build Tkinter UI
+# Invoke UI window
 root = tk.Tk()
 root.title("XPower Household Tariff Analysis")
 
