@@ -54,3 +54,53 @@ def compare_tariffs_from_data(df, flat_rate, tou_rates, tiered_tiers, fixed_fee=
         "Time-of-Use": calculate_tou_from_data(df, tou_rates, fixed_fee),
         "Tiered": calculate_tiered_from_data(df, tiered_tiers, fixed_fee)
     }
+
+# GUI
+consumption_df = None
+
+def load_file():
+    global consumption_df
+    file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
+    if file_path:
+        try:
+            consumption_df = load_consumption_data(file_path)
+            messagebox.showinfo("File Loaded", f"Data loaded from {file_path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to load file: {e}")
+
+def calculate_bill():
+    global consumption_df
+    if consumption_df is None:
+        messagebox.showerror("Error", "Please load a consumption CSV file first.")
+        return
+    try:
+        flat_rate = float(entry_flat_rate.get())
+        fixed_fee = float(entry_fixed_fee.get())
+        # Example tariffs
+        tou_rates = {"Peak": 0.40, "Shoulder": 0.25, "Off-Peak": 0.15}
+        tiered_tiers = [(100, 0.20), (300, 0.30), (float('inf'), 0.40)]
+        results = compare_tariffs_from_data(consumption_df, flat_rate, tou_rates, tiered_tiers, fixed_fee)
+        msg = "\n".join([f"{k}: ${v:.2f}" for k, v in results.items()])
+        messagebox.showinfo("Bill Comparison", msg)
+    except ValueError:
+        messagebox.showerror("Input Error", "Please enter valid numbers.")
+
+# Build Tkinter UI
+root = tk.Tk()
+root.title("XPower Household Tariff Analysis")
+
+tk.Button(root, text="Load Consumption File", command=load_file).grid(row=0, columnspan=2, pady=5)
+
+tk.Label(root, text="Flat Rate ($/kWh):").grid(row=1, column=0)
+entry_flat_rate = tk.Entry(root)
+entry_flat_rate.insert(0, "0.25")
+entry_flat_rate.grid(row=1, column=1)
+
+tk.Label(root, text="Fixed Fee ($):").grid(row=2, column=0)
+entry_fixed_fee = tk.Entry(root)
+entry_fixed_fee.insert(0, "10")
+entry_fixed_fee.grid(row=2, column=1)
+
+tk.Button(root, text="Calculate Bills", command=calculate_bill).grid(row=3, columnspan=2, pady=10)
+
+root.mainloop() 
